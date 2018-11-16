@@ -1,9 +1,17 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 def split_train_test(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify = y)
     return X_train, X_test, y_train, y_test
+
+def scale_train_test(X_train, X_test):
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train_scaled = scaler.transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    return X_train_scaled, X_test_scaled
 
 def split_seed_active(X, y):
     labels = np.unique(y)
