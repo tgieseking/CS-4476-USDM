@@ -5,6 +5,6 @@ from tempfile import TemporaryFile
 
 def siftFunc(input, output):
     outfile = TemporaryFile()
-    img = cv2.imread('input.jpg')
+    img = cv2.imread(input)
     siftArr = getSift(img)
     np.save('output.npy', siftArr)
