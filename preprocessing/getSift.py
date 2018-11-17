@@ -8,3 +8,9 @@ def getSift(img):
     kpimg = cv2.drawKeypoints(gray, kp, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     kp, des = sift.detectAndCompute(gray,None)
     return des
+
+
+def saveSIFT(image_path, output_path):
+    img = cv2.imread(image_path)
+    siftArr = getSift(img)
+    np.save(output_path, siftArr)
