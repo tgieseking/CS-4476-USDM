@@ -7,7 +7,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 from sklearn import datasets, svm, metrics
-from sklearn.model_selection import StratifiedKFold, KFold
+from sklearn.model_selection import StratifiedKFold, KFold, GridSearchCV
 from sklearn.svm import SVC
 from sklearn.metrics import f1_score
 
@@ -47,6 +47,24 @@ def train_svm(X_train, y_train):
     svm = SVC(C=C_vals[imax], gamma=gamma_vals[jmax], kernel="rbf")
     svm.fit(X_train, y_train)
     return svm, scores
+
+def train_svm_parallel(X_train, y_train, use_stratified):
+    C = [0.01, 0.1, 1., 10., 100.]
+    gamma = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+
+    param_grid = {"C": [0.01, 0.1, 1., 10., 100.], "gamma": [0.00001, 0.0001, 0.001, 0.01, 0.1]}
+
+    splitter = KFold(n_splits=5, shuffle=True)
+
+    grid_search = GridSearchCV(SVC(), param_grid, scoring="f1_micro", n_jobs=-1, cv=splitter, verbose=1)
+    grid_search.fit(X_train, y_train)
+
+    params = grid_search.best_params_
+    print(params)
+
+    svm = SVC(C=params["C"], gamma=params["gamma"], kernel="rbf")
+    svm.fit(X_train, y_train)
+    return svm, params, grid_search.cv_results_
 
 
 def svm_train(X_train, X_test, y_train, y_test, target_names=[]):
