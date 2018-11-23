@@ -1,25 +1,34 @@
 import numpy as np
-from activeLearning import get_training_set, uniform_random
+from activeLearning import get_training_set, only_seed, all_active, uniform_random, margin, k_center_greedy, usdm
 from classifier import train_svm
 from sklearn.metrics import f1_score
+from scipy.io import savemat
 import time
+import sys
 
-X_seed = np.load("data/COIL_X_seed.npy")
-y_seed = np.load("data/COIL_y_seed.npy")
-X_active = np.load("data/COIL_X_active.npy")
-y_active = np.load("data/COIL_y_active.npy")
-X_test = np.load("data/COIL_X_test.npy")
-y_test = np.load("data/COIL_y_test.npy")
+dataset = sys.argv[1]
+select_funcs = {"seed": only_seed, "all": all_active, "uniform": uniform_random, "margin": margin, "kcenter": k_center_greedy, "usdm": usdm}
+select_func = select_funcs[sys.argv[2]]
 
-active_size, _ = X_active.shape
-num_select = int(0.4 * active_size)
-X_train, y_train = get_training_set(X_seed, y_seed, X_active, y_active, num_select, uniform_random)
+
+X_seed = np.load("data/%s_X_seed.npy" % dataset)
+y_seed = np.load("data/%s_y_seed.npy" % dataset)
+X_active = np.load("data/%s_X_active.npy" % dataset)
+y_active = np.load("data/%s_y_active.npy" % dataset)
+X_test = np.load("data/%s_X_test.npy" % dataset)
+y_test = np.load("data/%s_y_test.npy" % dataset)
+
+num_classes = 1 + np.max(y_active)
+num_select = int(10 * num_classes)
+X_train, y_train = get_training_set(X_seed, y_seed, X_active, y_active, num_select, select_func)
 
 start = time.time()
-svm = train_svm(X_train, y_train)
+svm, train_mat = train_svm(X_train, y_train)
 y_pred = svm.predict(X_test)
 score = f1_score(y_test, y_pred, average="micro")
 print("f1 score: " + str(score))
-print("time: " + str(time.time() - start))
+runtime = str(time.time() - start)
+print("time: " + runtime)
 
-import pdb; pdb.set_trace()
+results = {"score": score, "y_pred": y_pred, "time": runtime, "train_mat": train_mat}
+savemat("results/%s_%s_results" % (dataset, sys.argv[2]), results)

@@ -7,7 +7,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 from sklearn import datasets, svm, metrics
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, KFold
 from sklearn.svm import SVC
 from sklearn.metrics import f1_score
 
@@ -17,9 +17,16 @@ def train_svm(X_train, y_train):
     C_vals = [0.01, 0.1, 1., 10., 100.]
     gamma_vals = [0.00001, 0.0001, 0.001, 0.01, 0.1]
 
-    splitter = StratifiedKFold(n_splits=5, shuffle=True)
-    split_gen = splitter.split(X_train, y_train)
-    splits = [split for split in split_gen]
+
+    try:
+        splitter = StratifiedKFold(n_splits=5, shuffle=True)
+        split_gen = splitter.split(X_train, y_train)
+        splits = [split for split in split_gen]
+    except:
+        # This is because we can't do stratified k-fold if there are less per instance than folds
+        splitter = KFold(n_splits=5, shuffle=True)
+        split_gen = splitter.split(X_train, y_train)
+        splits = [split for split in split_gen]
 
     scores = np.zeros((5, 5))
 
@@ -39,7 +46,7 @@ def train_svm(X_train, y_train):
 
     svm = SVC(C=C_vals[imax], gamma=gamma_vals[jmax], kernel="rbf")
     svm.fit(X_train, y_train)
-    return svm
+    return svm, scores
 
 
 def svm_train(X_train, X_test, y_train, y_test, target_names=[]):

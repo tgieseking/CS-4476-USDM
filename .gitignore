@@ -103,5 +103,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-/active-learning-master/
+/active_learning_master/
 /data/
+/results/
+results.txt
