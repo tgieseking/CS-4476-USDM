@@ -7,8 +7,40 @@ import pickle
 import matplotlib.pyplot as plt
 
 from sklearn import datasets, svm, metrics
+from sklearn.model_selection import StratifiedKFold
+from sklearn.svm import SVC
+from sklearn.metrics import f1_score
 
 from visualization import showConfusion
+
+def train_svm(X_train, y_train):
+    C_vals = [0.01, 0.1, 1., 10., 100.]
+    gamma_vals = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+
+    splitter = StratifiedKFold(n_splits=5, shuffle=True)
+    split_gen = splitter.split(X_train, y_train)
+    splits = [split for split in split_gen]
+
+    scores = np.zeros((5, 5))
+
+    for i, C in enumerate(C_vals):
+        for j, gamma in enumerate(gamma_vals):
+            print(C, gamma)
+            trial_scores = []
+            for train_inds, val_inds in splits:
+                svm = SVC(C=C, gamma=gamma, kernel="rbf")
+                svm.fit(X_train[train_inds], y_train[train_inds])
+                y_pred = svm.predict(X_train[val_inds])
+                trial_scores.append(f1_score(y_train[val_inds], y_pred, average = "micro"))
+            scores[i, j] = np.average(trial_scores)
+            print(scores)
+
+    imax, jmax = np.unravel_index(np.argmax(scores), scores.shape)
+
+    svm = SVC(C=C_vals[imax], gamma=gamma_vals[jmax], kernel="rbf")
+    svm.fit(X_train, y_train)
+    return svm
+
 
 def svm_train(X_train, X_test, y_train, y_test, target_names=[]):
     # digits = datasets.load_digits()
@@ -55,5 +87,3 @@ def classification_report_csv(report):
         report_data.append(row)
     dataframe = pd.DataFrame.from_dict(report_data)
     dataframe.to_csv('classification_report.csv', index = False)
-
-
