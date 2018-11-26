@@ -49,9 +49,6 @@ def train_svm(X_train, y_train):
     return svm, scores
 
 def train_svm_parallel(X_train, y_train, use_stratified):
-    C = [0.01, 0.1, 1., 10., 100.]
-    gamma = [0.00001, 0.0001, 0.001, 0.01, 0.1]
-
     param_grid = {"C": [0.01, 0.1, 1., 10., 100.], "gamma": [0.00001, 0.0001, 0.001, 0.01, 0.1]}
 
     splitter = KFold(n_splits=5, shuffle=True)

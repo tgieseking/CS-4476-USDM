@@ -12,6 +12,9 @@ select_funcs = {"seed": only_seed, "all": all_active, "uniform": uniform_random,
 select_func = select_funcs[selectName]
 
 
+print("\n\nRunning %s %s" % (dataset, selectName))
+
+
 X_seed = np.load("data/%s_X_seed.npy" % dataset)
 y_seed = np.load("data/%s_y_seed.npy" % dataset)
 X_active = np.load("data/%s_X_active.npy" % dataset)
