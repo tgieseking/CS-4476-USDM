@@ -1,1 +1,3 @@
 # CS-4476-USDM
+
+This is the code for the Multi-Class Active Learning and Image Classification project by Alhad Daftardar, Anish Visaria, Jason Lee, Naren Dikkala, and Timothy Gieseking. All active learning algorithms implementations, in particular the USDM, are in activeLearning.py. A classification problem can be run using the runClassification.py script with first argument data set name and second argument the active learning algorithm. If using the k-center algorithm, the [Google Active Learning Playground](https://github.com/google/active-learning) library must be included in the project folder.
